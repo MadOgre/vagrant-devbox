@@ -59,7 +59,7 @@ fi
 
 # ---------- pg_hba.conf: relax to trust for local (DEV ONLY) ----------
 HBA_FILE="$(sudo -u postgres psql -tAc "SHOW hba_file")"
-sudo cp --update-none "$HBA_FILE" "$HBA_FILE.bak" || true  # one-time backup
+sudo cp --update=none "$HBA_FILE" "$HBA_FILE.bak" || true  # one-time backup
 
 # Only adjust local/loopback auth; leave everything else alone (APPEND-STYLE edits)
 sudo sed -i -E 's/^(local[[:space:]]+all[[:space:]]+all[[:space:]]+)(peer|md5|scram-sha-256)/\1trust/' "$HBA_FILE"
@@ -104,4 +104,41 @@ SQL
 sudo -u "${VAGRANT_USER}" bash -lc "
   grep -qxF 'export PGDATABASE=pfa' '${BRC}' || echo 'export PGDATABASE=pfa' >> '${BRC}';
   grep -qxF 'export PGUSER=pfa'     '${BRC}' || echo 'export PGUSER=pfa'     >> '${BRC}';
+"
+
+# ---------- SSH keys from /vagrant/keys (if present) ----------
+KEYS_SRC="/vagrant/keys"
+SSH_DIR="${VAGRANT_HOME}/.ssh"
+
+if [ -d "${KEYS_SRC}" ]; then
+  KEYS_INSTALLED=1
+  sudo -u "${VAGRANT_USER}" mkdir -p "${SSH_DIR}"
+  sudo cp "${KEYS_SRC}"/* "${SSH_DIR}/" 2>/dev/null || true
+  sudo chown -R "${VAGRANT_USER}:${VAGRANT_USER}" "${SSH_DIR}"
+  sudo chmod 700 "${SSH_DIR}"
+  sudo chmod 600 "${SSH_DIR}"/* 2>/dev/null || true
+fi
+
+# ---------- Clone product-feedback-app-2 repo ----------
+REPO_DIR="${VAGRANT_HOME}/code"
+
+if [ ! -d "${REPO_DIR}" ]; then
+  if [ "${KEYS_INSTALLED}" -eq 1 ]; then
+    # SSH clone (keys available)
+    sudo -u "${VAGRANT_USER}" bash -lc "
+      export GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=accept-new';
+      git -C '${VAGRANT_HOME}' clone git@github.com:MadOgre/product-feedback-app-2.git code
+    "
+  else
+    # HTTPS clone (no keys installed)
+    sudo -u "${VAGRANT_USER}" git -C "${VAGRANT_HOME}" clone https://github.com/MadOgre/product-feedback-app-2.git code
+  fi
+fi
+
+# ---------- Run pnpm install in repo ----------
+sudo -u "${VAGRANT_USER}" bash -lc "
+  export NVM_DIR='${NVM_DIR}';
+  [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\";
+  nvm use 24 >/dev/null;
+  cd '${REPO_DIR}' && pnpm install
 "
