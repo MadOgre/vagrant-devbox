@@ -29,5 +29,16 @@ An OS-agnostic development environment for collaboration
 
 9. Serve the repository locally by running `vite run dev`
 
-10. Configure VSCode to connect to `/home/vagrant/code` folder on the virtual server by using **Remote - SSH** extension by Microsoft
+10. In your ~/.ssh/config file, add the following configuration
 
+```
+   Host pfa-devbox
+   HostName localhost
+   Port 2222
+   User vagrant
+   IdentityFile [ABSOLUTE-PATH-TO-DEVBOX-REPO]/.vagrant/machines/default/virtualbox/private_key
+```
+
+11. Configure VSCode to connect to `/home/vagrant/code` folder on the virtual server by using **Remote - SSH** extension by Microsoft
+
+12. Connect to host "pfa-devbox" using VSCode and install recommended extensions
