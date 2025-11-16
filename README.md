@@ -11,25 +11,25 @@ An OS-agnostic development environment for collaboration
 ```
    git clone git@github.com:MadOgre/vagrant-devbox.git
 ```
-4. (optional) if you use ssh key to access your GitHub account, copy both private and public key into keys subfolder inside devbox
+4. (optional) if you use ssh key to access your GitHub account, copy both private and public key into `keys` subfolder inside repo folder above
    
 5. (optional) copy the `Vagrantfile.local.sample` into `Vagrantfile.local` - you may change number of cpus and memory or add custom mount points
 
-5. run `vagrant up` - this will perform provisioning, install the keys if present, then clone the main code repository into `/home/vagrant/code`, and run all the necessary scripts such as `pnpm install`
+6. run `vagrant up` - this will perform provisioning, install the keys if present, then clone the main code repository into `/home/vagrant/code` on the newly existing VM, and run all the necessary scripts such as `pnpm install`
 
-6. Wait for provisioning to complete
+7. Wait for provisioning to complete
 
-7. Run commands to configure git
+8. Run `vagrant ssh` to connect to the machine, change to the code folder (`cd code`)
+
+9. Run commands to configure git
 ```
    git config --global user.email "myemail@example.com"
    git config --global user.name "John Collaborator"
 ```
 
-8. Run `vagrant ssh` to connect to the machine
+10. Serve the repository locally by running `vite run dev`
 
-9. Serve the repository locally by running `vite run dev`
-
-10. In your ~/.ssh/config file, add the following configuration
+11. On your host machine in your ~/.ssh/config file, add the following configuration
 
 ```
    Host pfa-devbox
@@ -39,6 +39,6 @@ An OS-agnostic development environment for collaboration
    IdentityFile [ABSOLUTE-PATH-TO-DEVBOX-REPO]/.vagrant/machines/default/virtualbox/private_key
 ```
 
-11. Configure VSCode to connect to `/home/vagrant/code` folder on the virtual server by using **Remote - SSH** extension by Microsoft
+12. Configure VSCode to connect to `/home/vagrant/code` folder on the virtual server by using **Remote - SSH** extension by Microsoft
 
-12. Connect to host "pfa-devbox" using VSCode and install recommended extensions
+13. Connect to host "pfa-devbox" using VSCode and install recommended extensions
