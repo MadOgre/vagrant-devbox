@@ -7,6 +7,11 @@ BRC="${VAGRANT_HOME}/.bashrc"
 BPF="${VAGRANT_HOME}/.profile"
 NVM_DIR="${VAGRANT_HOME}/.nvm"
 
+# ----- Hostname setup -----
+NEW_HOSTNAME="pfa-devbox"
+echo "${NEW_HOSTNAME}" | sudo tee /etc/hostname >/dev/null
+sudo hostnamectl set-hostname "${NEW_HOSTNAME}"
+
 # ---------- NVM + Node (as vagrant) ----------
 if ! sudo -u "${VAGRANT_USER}" bash -lc 'command -v nvm >/dev/null 2>&1'; then
   sudo -u "${VAGRANT_USER}" bash -lc 'curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash'
